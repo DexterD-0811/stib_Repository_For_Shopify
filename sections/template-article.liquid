@@ -47,7 +47,13 @@
 </article>
 
 {%  if blog.comments_enabled? %}
-  HELLO WORLD
+  <div id="comments" class="my-8">
+    {% if article.comments_count > 0 %}
+
+    {% else %}
+      No Comments Yet
+    {% endif %}
+  </div>
 {% endif %}
 
 
