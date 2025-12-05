@@ -1,54 +1,50 @@
-<article class="py-8" itemscope itemtype="https://schema.org/BlogPosting">
-
-  <!-- Main entity -->
-  <meta itemprop="mainEntityOfPage" content="{{ article.url }}">
-
-  <!-- Headline -->
-  <h1 itemprop="headline">{{ article.title }}</h1>
-
-  <!-- Author -->
-  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-    <meta itemprop="name" content="{{ article.author }}">
-    {{ article.author }}
-  </span>
-
-  <!-- Publisher -->
-  <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
-    <meta itemprop="name" content="{{ shop.name }}">
-    {% if shop.brand.logo %}
-      <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
-        <meta itemprop="url" content="{{ shop.brand.logo | image_url: width: 300 }}">
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- Date Published -->
-  <time itemprop="datePublished" datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
-    {{ article.published_at | date: "%B %d, %Y" }}
-  </time>
-
-  <!-- Date Created -->
-  <meta itemprop="dateCreated" content="{{ article.created_at | date: '%Y-%m-%d' }}">
-
-  <!-- Image -->
-  {% if article.image %}
-    <img 
-      src="{{ article.image | image_url: width: 1600 }}"
-      alt="{{ article.image.alt | escape }}"
-      itemprop="image"
-    >
-  {% endif %}
-
-  <!-- Description -->
-  <meta itemprop="description" content="{{ article.excerpt | strip_html | truncate: 160 }}">
-
-  <!-- Article Body -->
-  <div itemprop="articleBody">
-    {{ article.content }}
-  </div>
-
+<article class="py-8" itemscope itemtype="http://schema.org/BlogPosting">
+  {% for block in section.blocks %}
+    {% case block.type %}
+      {% when 'article_title' %}
+        <div class="flex items-center justify-center">
+          <div class="div max-w-7xl text-center">
+            <a href="{{ blog.url }}" class="text-base uppercase text-gray-500 hover:text-gray-900 font-bold">{{ blog.title }}</a>
+            <h1 class="text-4xl md:text-6xl font-medium" itemprop="headline">{{  article.title }}</h1>
+          </div>
+        </div>
+        
+      {% when 'article_author' %}
+        <div class="flex item-center justify-center">
+          <div class="div max-w-7xl text-center" itemscope itemtype="http://schema.org/Person">
+            {% if section.settings.enable_author %}
+              <small itemprop="author">{{ article.author }}</small >
+            {% endif %}
+          </div>
+        </div>
+      {% when 'article_published_date' %}
+        <div class="div flex-center justify-center">
+          <div class="div max-w-7xl text-center">
+            {% if section.settings.enable_published_date %}
+              <time itemprop="datePublished dateCreated" datetime="{{ article.published_at | date: format: 'on_date' }}">
+                {{ article.published_at | date: "%B %d, %Y" }}
+              </time>
+            {% endif %}
+          </div>
+        </div>
+      {% when 'featured_image' %}
+        <div itemprop="image" class="max-w-7xl bg-blue-100 rounded-lg mx-2 md:mx-auto overflow-hidden my-4">
+          {% if article.image != blank %}
+            <img class="w-full h-80 md:h-96 object-cover object-center" src="{{ article.image | img_url: 'large' }}" loading="lazy" alt="{{ article.image.alt }}">
+          {% else %}
+            {% assign placeholder_image = 'lifestyle-1' %}
+            {{ placeholder_image | placeholder_svg_tag: 'w-full h-80 md:h-96 object-cover object-center p-5', alt: 'Placeholder image' }}
+          {% endif %}
+        </div>
+      {% when 'article_content' %}
+        <div class="flex items-center justify-center">
+          <div itemprop="articleBody" class="max-w-7xl">
+            {{ article.content }}
+          </div>
+        </div>
+    {%endcase  %}
+  {% endfor %}
 </article>
-
 
 {% if blog.comments_enabled? %}
   <div id="comments" class="my-8">
@@ -146,8 +142,20 @@
   </div>
 {% endif %}
 
-
-
+<script>
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "{{ article.title | json }}",
+    "articleBody": "{{ article.content | strip_html | json }}",
+    {% if article.excerpt != blank %}
+      "description": "{{ article.excerpt | strip_html | json }}",
+    {% endif %}
+    {% if article.image %}
+      "image": ["{{ article.image.src | img_url: 'medium' | prepend: 'https:' | json }}"],
+    {% endif %}
+  }
+</script>
 
 {% schema %}
 {
