@@ -143,29 +143,30 @@
 {% endif %}
 
 <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "BlogPosting",
-    "headline": "{{ article.title | json }}",
-    "articleBody": "{{ article.content | strip_html | json }}",
-    {% if article.excerpt != blank %}
-      "description": "{{ article.excerpt | strip_html | json }}",
-    {% endif %}
-    {% if article.image %}
-      "image": ["{{ article.image.src | img_url: 'medium' | prepend: 'https:' | json }}"],
-    {% endif %}
-    "datePublished": "{{ article.published_at | date: format: 'default' | json }}",
-    "dateCreated": "{{ article.created_at | date: format: 'default' | json }}",
-    "author": {
-      "@type": "Person",
-      "name": "{{ article.author | json }}"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "{{ shop.name | json }}",
-    }
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ article.title | json }},
+  "articleBody": {{ article.content | strip_html | json }},
+  {% if article.excerpt != blank %}
+  "description": {{ article.excerpt | strip_html | truncate: 160 | json }},
+  {% endif %}
+  {% if article.image %}
+  "image": ["{{ article.image | image_url: width: 1600 }}"],
+  {% endif %}
+  "datePublished": {{ article.published_at | date: "%Y-%m-%d" | json }},
+  "dateCreated": {{ article.created_at | date: "%Y-%m-%d" | json }},
+  "author": {
+    "@type": "Person",
+    "name": {{ article.author | json }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }}
   }
+}
 </script>
+
 
 {% schema %}
 {
