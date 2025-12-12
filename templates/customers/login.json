@@ -10,13 +10,9 @@
 {
   "sections": {
     "main": {
-      "type": "main-blog",
+      "type": "main-login",
       "settings": {
-        "layout": "collage",
-        "show_image": true,
-        "image_height": "medium",
-        "show_date": true,
-        "show_author": false,
+        "enable_shop_login_button": "true",
         "padding_top": 36,
         "padding_bottom": 36
       }
